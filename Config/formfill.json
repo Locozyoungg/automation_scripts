@@ -1,0 +1,16 @@
+{
+  "_comment": "BrowserAutomation form-fill definitions. url_pattern is a substring match on the tab URL (allow-listed domains only). secret fields read from Credential Manager (value prefix cred:) and are NEVER stored here. dry_run highlights fields without filling. Nothing auto-submits unless submit is true.",
+  "forms": [
+    {
+      "name": "Example (edit or delete)",
+      "url_pattern": "example.com/contact",
+      "dry_run": false,
+      "submit": false,
+      "fields": [
+        { "selector": "#name", "value": "Your Name" },
+        { "selector": "#email", "value": "you@example.com" },
+        { "selector": "#password", "value": "cred:AHK-web-example", "secret": true }
+      ]
+    }
+  ]
+}

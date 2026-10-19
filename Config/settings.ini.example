@@ -1,0 +1,97 @@
+; ============================================================
+; Automation & Protection Toolkit — settings
+; Tools re-read this on every use (most also on a timer).
+; Secrets NEVER go here — store them in Windows Credential Manager:
+;   cmdkey /generic:AHK-ntfy /user:token /pass:<your-token>
+; ============================================================
+
+[alerts]
+; Push alerts via ntfy (0 = off). Requires alerts.ntfy_url + a credential.
+ntfy_enabled=0
+; ntfy push URL, e.g. https://ntfy.sh/my-private-topic
+ntfy_url=
+; Credential Manager target holding the ntfy bearer token
+cred_target=AHK-ntfy
+rate_limit_seconds=60
+
+[tools]
+; 1 = start with the Launcher, 0 = disabled. The tray menu toggles these.
+DevHotkeys=1
+TextExpander=1
+ClipboardManager=1
+WindowManager=1
+GitWorkflow=1
+BrowserAutomation=0
+FocusMode=1
+CommandPalette=1
+HealthHUD=1
+DevEnvDoctor=1
+SecurityCheck=1
+Remediate=1
+PersistenceMonitor=1
+USBGuard=1
+NetworkWatch=1
+HostsGuard=1
+ClipboardGuard=1
+SecretsScanner=1
+LogonWatch=1
+PrivacyMonitor=1
+BackupGuardian=0
+PanicKey=1
+
+[hotkeys]
+; Hotkey bindings (AHK v2 syntax). Restart the tool (or the Launcher) after edits.
+run_tests=Win+Alt+T
+git_gui=Win+Alt+B
+copy_path=Win+Alt+C
+kill_port=Win+Alt+K
+print_port=Win+Alt+P
+open_env_example=Win+Alt+E
+clip_menu=Win+Shift+C
+clip_cycle=Win+Shift+V
+clip_clear=Win+Shift+X
+focus_mode=Win+Alt+F12
+palette=Ctrl+Alt+Space
+health_hud=Win+Alt+H
+dev_doctor=Win+Alt+D
+browser_jira=Win+Alt+J
+browser_fill=Win+Alt+F
+browser_scrape=Win+Alt+S
+secrets_scan=Win+Alt+9
+privacy_mute=Win+Alt+Q
+panic=Ctrl+Alt+Shift+Pause
+
+[clipboard]
+max_items=10
+image_enabled=0
+image_max_kb=1024
+expire_minutes=30
+
+[windowmanager]
+auto_apply_on_display_change=1
+default_layout=default
+
+[security]
+; Roots SecretsScanner walks (semicolon-separated)
+secrets_roots=C:\dev
+; SecretsScanner skip dirs (comma-separated)
+scan_skip_dirs=node_modules,.git,build,dist,out,vendor,.venv,venv,__pycache__,target,obj
+usb_readonly_prompt=0
+network_watch_outbound=0
+vpn_prompt_open_wifi=0
+backup_source=C:\dev
+; Backup destination, e.g. D:\backups — REQUIRED before BackupGuardian runs
+backup_dest=
+backup_retention=7
+
+[focus]
+; Apps to mute/minimize when Focus Mode is on (pipe-separated exe names)
+distract_apps=slack.exe,discord.exe,telegram.exe
+pomodoro_minutes=25
+
+[panic]
+kill_network=1
+mute_mic=1
+clear_clipboard=1
+lock_workstation=1
+close_cdp=1

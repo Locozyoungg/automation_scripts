@@ -1,0 +1,11 @@
+# Runtime artifacts — never commit
+Logs/
+Data/
+
+# Machine-specific security baselines and local overrides
+Config/baseline/
+Config/settings.local.ini
+
+# OS noise
+Thumbs.db
+Desktop.ini
