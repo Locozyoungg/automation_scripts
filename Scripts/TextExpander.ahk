@@ -155,7 +155,10 @@ _EnsureHook() {
         if _Hook is InputHook
             _Hook.Stop()
     }
-    _Hook := InputHook("I1", " `t`n", _TriggersNow())
+    ; v2.0.30 InputHook ctor: MatchList is a space-separated STRING (an
+    ; Array is rejected: "Parameter #4 ... requires a String"). The string
+    ; is built at runtime - the " ;" source trap forbids writing it literal.
+    _Hook := InputHook("I1", " `t`n", StrJoin(_TriggersNow(), " "))
     _Hook.OnMatch := _OnMatch
     _Hook.Start()
 }
