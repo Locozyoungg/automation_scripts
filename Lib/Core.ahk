@@ -474,13 +474,16 @@ RunPS(script, timeoutSec := 30, args := "") {
             }
             Sleep 40
         }
+        if timedOut {
+            ; Skip StdOut/StdErr reads on the timeout path: a grandchild
+            ; process (e.g. schtasks under PS 5.1) can keep the pipe open
+            ; after Terminate(), and ReadAll would block forever.
+            Log("RunPS timeout after " . timeoutSec . "s", "WARN")
+            return Map("ok", false, "exit", -1, "stdout", "", "stderr", "", "timeout")
+        }
         stdout := "", stderr := ""
         try stdout := exec.StdOut.ReadAll()
         try stderr := exec.StdErr.ReadAll()
-        if timedOut {
-            Log("RunPS timeout after " . timeoutSec . "s", "WARN")
-            return Map("ok", false, "exit", -1, "stdout", stdout, "stderr", "timeout")
-        }
         return Map("ok", exec.ExitCode == 0, "exit", Integer(exec.ExitCode), "stdout", stdout, "stderr", stderr)
     } catch as e {
         Log("RunPS launch failure: " . ErrText(e), "ERROR")
@@ -499,6 +502,33 @@ RunPSJson(script, timeoutSec := 30, fallback := Map()) {
         return JSON.parse(out)
     catch {
         Log("RunPSJson: unparseable output: " . SubStr(StrReplace(out, "`n", " "), 1, 200), "WARN")
+        return fallback
+    }
+}
+
+RunPSJsonF(script, timeoutSec := 30, fallback := Map()) {
+    ; File-based JSON variant of RunPSJson. Some PS 5.1 modules
+    ; (ScheduledTasks, Storage, NetAdapter) can leave the stdout pipe in a
+    ; state where the final pipeline output is dropped - or the process
+    ; stalls - when spawned via WScript.Shell.Exec. Writing the JSON to a
+    ; file and reading it back sidesteps the pipe entirely.
+    ; The script MUST end with a pipeline that emits the JSON object
+    ; (it is appended to a Set-Content that stores it).
+    EnsureDirs()
+    outFile := Env.DataDir . "\tmp\psj-" . _OwnPID() . "-" . A_TickCount . "-" . Random(10000, 99999) . ".json"
+    wrapped := "$AHK_JSON_OUT=" . _PsLit(outFile) . ";" . script . "|Set-Content -Path $AHK_JSON_OUT -Encoding UTF8"
+    r := RunPS(wrapped, timeoutSec)
+    txt := ""
+    if FileExist(outFile) {
+        try txt := Trim(StrReplace(FileRead(outFile), "`uFEFF", ""))
+        try FileDelete(outFile)
+    }
+    if !r["ok"] || txt == ""
+        return fallback
+    try
+        return JSON.parse(txt)
+    catch {
+        Log("RunPSJsonF: unparseable output: " . SubStr(StrReplace(txt, "`n", " "), 1, 200), "WARN")
         return fallback
     }
 }

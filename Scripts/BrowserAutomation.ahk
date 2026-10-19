@@ -19,6 +19,7 @@
 SendMode "Input"
 SetWorkingDir A_ScriptDir
 #Include ..\Lib\Core.ahk
+#Include ..\Lib\CDP.ahk
 
 Pass := 0
 Fail := 0

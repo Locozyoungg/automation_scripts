@@ -14,7 +14,7 @@ It **complements, never replaces** Windows Defender / EDR. No telemetry, no auto
 | `Scripts\Launcher.ahk` (tray host) | ✅ shipped, selftest clean |
 | `Tests\Test-Core.ahk` | ✅ shipped, green |
 | Productivity tools (DevHotkeys, TextExpander, ClipboardManager, WindowManager, GitWorkflow, BrowserAutomation, FocusMode, CommandPalette, HealthHUD, DevEnvDoctor) | ✅ shipped, selftest-green |
-| Security suite (SecurityCheck, Remediate, PersistenceMonitor, USBGuard, NetworkWatch, HostsGuard, ClipboardGuard, SecretsScanner, LogonWatch, PrivacyMonitor, BackupGuardian, PanicKey) | 🚧 in progress |
+| Security suite (SecurityCheck, Remediate, PersistenceMonitor, USBGuard, NetworkWatch, HostsGuard, ClipboardGuard, SecretsScanner, LogonWatch, PrivacyMonitor, BackupGuardian, PanicKey) | ✅ shipped, selftest-green |
 | Installer + Task Scheduler (`Install\Install.ps1`, logon + weekly XMLs) | ✅ files shipped — task registration runs once you approve it (see below) |
 
 The hotkey table below lists the full planned surface; keys marked 🚧 activate once their tool ships.
@@ -85,9 +85,9 @@ Scope `A` = global; `VS Code` = only when a VS Code window is active; `Term` = t
 | CommandPalette | `Ctrl+Alt+Space` | fuzzy launcher (tools, actions, snippets) | A | `palette` |
 | HealthHUD | `Win+Alt+H` | CPU/RAM/disk/net/VPN overlay | A | `health_hud` |
 | DevEnvDoctor | `Win+Alt+D` | toolchain + dependency-vulnerability report | A | `dev_doctor` |
-| SecretsScanner 🚧 | `Win+Alt+9` | scan configured roots for hardcoded secrets | A | `secrets_scan` |
-| PrivacyMonitor 🚧 | `Win+Alt+Q` | mute/unmute system microphone | A | `privacy_mute` |
-| PanicKey 🚧 | `Ctrl+Alt+Shift+Pause` | lock, mute mic, purge clipboard, cut network | A | `panic` |
+| SecretsScanner | `Win+Alt+9` | scan configured roots for hardcoded secrets | A | `secrets_scan` |
+| PrivacyMonitor | `Win+Alt+Q` | mute/unmute system microphone | A | `privacy_mute` |
+| PanicKey | `Ctrl+Alt+Shift+Pause` | lock, mute mic, purge clipboard, cut network | A | `panic` |
 
 **Hotkey conflicts already resolved for you:** clipboard menu avoids `Win+V` (Windows history); Git GUI uses `Win+Alt+B` (Game Bar uses `Win+Alt+G`/`Win+Alt+R` on some builds). Edit any binding in `Config\settings.ini` → `[hotkeys]`, then restart the tool or the Launcher.
 
