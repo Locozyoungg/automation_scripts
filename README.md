@@ -13,9 +13,9 @@ It **complements, never replaces** Windows Defender / EDR. No telemetry, no auto
 | Core library (`Lib\Core.ahk` + Toast/JSON/Crypto/UIA/CDP) | ✅ shipped, test-validated (26/26 smoke tests) |
 | `Scripts\Launcher.ahk` (tray host) | ✅ shipped, selftest clean |
 | `Tests\Test-Core.ahk` | ✅ shipped, green |
-| Productivity tools (DevHotkeys, TextExpander, ClipboardManager, WindowManager, GitWorkflow, BrowserAutomation, FocusMode, CommandPalette, HealthHUD, DevEnvDoctor) | 🚧 in progress |
+| Productivity tools (DevHotkeys, TextExpander, ClipboardManager, WindowManager, GitWorkflow, BrowserAutomation, FocusMode, CommandPalette, HealthHUD, DevEnvDoctor) | ✅ shipped, selftest-green |
 | Security suite (SecurityCheck, Remediate, PersistenceMonitor, USBGuard, NetworkWatch, HostsGuard, ClipboardGuard, SecretsScanner, LogonWatch, PrivacyMonitor, BackupGuardian, PanicKey) | 🚧 in progress |
-| Installer + Task Scheduler (`Install\Install.ps1`, logon + weekly XMLs) | 🚧 in progress |
+| Installer + Task Scheduler (`Install\Install.ps1`, logon + weekly XMLs) | ✅ files shipped — task registration runs once you approve it (see below) |
 
 The hotkey table below lists the full planned surface; keys marked 🚧 activate once their tool ships.
 
@@ -67,24 +67,24 @@ Scope `A` = global; `VS Code` = only when a VS Code window is active; `Term` = t
 |---|---|---|---|---|
 | Launcher | tray menu | start/stop tools, logs, panic | tray | — |
 | every tool | `Esc`+`Pause` | kill-switch (clean exit + log line) | A | — |
-| DevHotkeys 🚧 | `Win+Alt+T` | run tests for the current project (npm/pnpm/yarn, dotnet, pytest, cargo, go, forge/hardhat) | VS Code | `run_tests` |
-| DevHotkeys 🚧 | `Win+Alt+B` | open project in Git GUI / terminal | VS Code | `git_gui` |
-| DevHotkeys 🚧 | `Win+Alt+C` | copy current file path (+`Shift` relative, +`Ctrl` path:line) | VS Code | `copy_path` |
-| DevHotkeys 🚧 | `Win+Alt+K` | kill the process on a port (confirm first) | A | `kill_port` |
-| DevHotkeys 🚧 | `Win+Alt+P` | print PID/cmdline of the process on a port | A | `print_port` |
-| DevHotkeys 🚧 | `Win+Alt+E` | open the project's `.env.example` (never `.env`) | VS Code | `open_env_example` |
-| ClipboardManager 🚧 | `Win+Shift+C` | clipboard history menu (select / pin) | A | `clip_menu` |
-| ClipboardManager 🚧 | `Win+Shift+V` | cycle-paste through history | A | `clip_cycle` |
-| ClipboardManager 🚧 | `Win+Shift+X` | clear all history | A | `clip_clear` |
-| WindowManager 🚧 | `Win+Numpad0` / `Win+Numpad1` | restore / save window layout | A | — |
-| WindowManager 🚧 | `Win+Alt+←→↑↓` | half/quarter snapping | A | — |
-| WindowManager 🚧 | `Win+Alt+M` | move window to next monitor | A | — |
-| GitWorkflow 🚧 | (menu) | smart commit, branch switcher, cleanup, rebase pull | Term/IDE | — |
-| BrowserAutomation 🚧 | `Win+Alt+J` / `F` / `S` | Jira/PR from branch · form fill · table→TSV | browser | `browser_jira/fill/scrape` |
-| FocusMode 🚧 | `Win+Alt+F12` | toggle Do-Not-Disturb + block distractions | A | `focus_mode` |
-| CommandPalette 🚧 | `Ctrl+Alt+Space` | fuzzy launcher (tools, actions, snippets) | A | `palette` |
-| HealthHUD 🚧 | `Win+Alt+H` | CPU/RAM/disk/net/VPN overlay | A | `health_hud` |
-| DevEnvDoctor 🚧 | `Win+Alt+D` | toolchain + dependency-vulnerability report | A | `dev_doctor` |
+| DevHotkeys | `Win+Alt+T` | run tests for the current project (npm/pnpm/yarn, dotnet, pytest, cargo, go, forge/hardhat) | VS Code | `run_tests` |
+| DevHotkeys | `Win+Alt+B` | open project in Git GUI / terminal | VS Code | `git_gui` |
+| DevHotkeys | `Win+Alt+C` / `+Shift` / `+Ctrl` | copy current file path (plain / relative / path:line) | VS Code | `copy_path`, `copy_path_rel`, `copy_path_line` |
+| DevHotkeys | `Win+Alt+K` | kill the process on a port (confirm first) | A | `kill_port` |
+| DevHotkeys | `Win+Alt+P` | print PID/cmdline of the process on a port | A | `print_port` |
+| DevHotkeys | `Win+Alt+E` | open the project's `.env.example` (never `.env`) | VS Code | `open_env_example` |
+| ClipboardManager | `Win+Shift+C` | clipboard history menu (select / pin) | A | `clip_menu` |
+| ClipboardManager | `Win+Shift+V` | cycle-paste through history | A | `clip_cycle` |
+| ClipboardManager | `Win+Shift+X` | clear all history | A | `clip_clear` |
+| WindowManager | `Win+Numpad0` / `Win+Numpad1` | restore / save window layout | A | — |
+| WindowManager | `Win+Alt+←→↑↓` (+Shift = quarters) | half/quarter snapping | A | — |
+| WindowManager | `Win+Alt+M` | move window to next monitor | A | — |
+| GitWorkflow | `Win+Alt+Shift+G` | smart commit, branch switcher, cleanup, rebase pull | Term/IDE | `git_menu` |
+| BrowserAutomation | `Win+Alt+J` / `F` / `S` | Jira/PR from branch · form fill · table→TSV | browser | `browser_jira/fill/scrape` |
+| FocusMode | `Win+Alt+F12` | toggle Do-Not-Disturb + block distractions | A | `focus_mode` |
+| CommandPalette | `Ctrl+Alt+Space` | fuzzy launcher (tools, actions, snippets) | A | `palette` |
+| HealthHUD | `Win+Alt+H` | CPU/RAM/disk/net/VPN overlay | A | `health_hud` |
+| DevEnvDoctor | `Win+Alt+D` | toolchain + dependency-vulnerability report | A | `dev_doctor` |
 | SecretsScanner 🚧 | `Win+Alt+9` | scan configured roots for hardcoded secrets | A | `secrets_scan` |
 | PrivacyMonitor 🚧 | `Win+Alt+Q` | mute/unmute system microphone | A | `privacy_mute` |
 | PanicKey 🚧 | `Ctrl+Alt+Shift+Pause` | lock, mute mic, purge clipboard, cut network | A | `panic` |
@@ -93,7 +93,7 @@ Scope `A` = global; `VS Code` = only when a VS Code window is active; `Term` = t
 
 ---
 
-## Snippets (TextExpander 🚧)
+## Snippets (TextExpander)
 
 Type these in any app (Space/Enter/Tab triggers): `;gitpush` · `;pr` · `;shrug` · `;date` · `;iso` · `;uuid` · `;commit` · `;ty`. Add your own in `Config\snippets.ini` (no code changes):
 
