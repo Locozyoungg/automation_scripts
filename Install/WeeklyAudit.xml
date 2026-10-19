@@ -20,7 +20,7 @@
     <Principal id="Author">
       <UserId>__USER_SID__</UserId>
       <LogonType>InteractiveToken</LogonType>
-      <RunLevel>Highest</RunLevel>
+      <RunLevel>HighestAvailable</RunLevel>
     </Principal>
   </Principals>
   <Settings>

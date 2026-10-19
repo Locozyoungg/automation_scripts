@@ -33,6 +33,9 @@ StartTool(rec) {
     args := "--child" . (DebugTray ? " --debug-tray" : "")
     try {
         pid := Run(_Q(A_AhkPath) . " " . _Q(ToolPath(rec.script)) . " " . args)
+        ; v2.0.30 Run returns "" even on success - discover the real PID.
+        if pid == ""
+            pid := _FindNewPid(rec.name)
         Child[rec.name] := {pid: pid, attempts: 0}
         Log("Launcher: started " . rec.name . " (pid " . pid . ")", "INFO")
         return true
@@ -40,6 +43,21 @@ StartTool(rec) {
         Log("Launcher: StartTool failed for " . rec.name . ": " . ErrText(e), "ERROR")
         return false
     }
+}
+
+_FindNewPid(toolName) {
+    ; WMI lookup: the AutoHotkey64 process running this tool's script.
+    ; (#SingleInstance guarantees at most one per script.)
+    try {
+        wmi := ComObject("WbemScripting.SWbemLocator").ConnectServer(".", "root\cimv2")
+        for proc in wmi.ExecQuery("SELECT ProcessId, CommandLine FROM Win32_Process WHERE Name='AutoHotkey64.exe'") {
+            if InStr(String(proc.CommandLine), "\" . toolName . ".ahk")
+                return Integer(proc.ProcessId)
+        }
+    } catch as e {
+        Log("Launcher: PID discovery failed: " . ErrText(e), "ERROR")
+    }
+    return 0
 }
 
 StopTool(name) {
@@ -92,8 +110,10 @@ Watchdog() {
 BuildMenu() {
     Global SafeMode, TOOLKIT_VERSION
     try A_TrayMenu.Delete()
-    catch
-        ; fresh menu — nothing to remove
+    catch {
+        ; fresh menu — nothing to remove (empty block: a bare catch would
+        ; swallow the next statement as its body)
+    }
     head := "Toolkit v" . TOOLKIT_VERSION . (SafeMode ? " — SAFE MODE" : "")
     A_TrayMenu.Add(head, (*) => 0)
     A_TrayMenu.Disable(head)

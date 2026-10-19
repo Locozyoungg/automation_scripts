@@ -846,7 +846,10 @@ OpenInTerminal(cmd, dir) {
 ; logged (full error: message, what, file, line) and toasted — never silent.
 ;------------------------------------------------------------------------------
 SafeWrap(fn, title) {
-    wrapped() {
+    ; The catch-all (*) parameter is required: v2's Hotkey rejects 0-param
+    ; named functions as callbacks ("Invalid callback function"), but
+    ; accepts variadic ones (it passes the hotkey name as an argument).
+    wrapped(*) {
         try fn()
         catch as e {
             Log(title . " failed: " . ErrText(e), "ERROR")
@@ -856,9 +859,20 @@ SafeWrap(fn, title) {
     return wrapped
 }
 
+_NormalizeHotkey(key) {
+    ; v2.0.30 Hotkey() rejects NAMED modifiers ("Win+Alt+T" -> "Invalid
+    ; hotkey") - it wants the symbolic form. Translate Win/Alt/Ctrl/Shift.
+    key := StrReplace(key, "Win+", "#")
+    key := StrReplace(key, "Alt+", "!")
+    key := StrReplace(key, "Ctrl+", "^")
+    key := StrReplace(key, "Shift+", "+")
+    return key
+}
+
 BindHotkey(key, fn, title := "") {
     if title == ""
         title := key
+    key := _NormalizeHotkey(key)
     try Hotkey(key, SafeWrap(fn, title))
     catch as e {
         Log("BindHotkey failed for " . key . ": " . ErrText(e), "ERROR")
@@ -899,8 +913,10 @@ _AddTrayMenu() {
     ; Standard tray menu. Launcher children hide the icon entirely, so this
     ; only shows when a tool runs standalone (or with the debug-tray flag).
     try A_TrayMenu.Delete()
-    catch
-        ; nothing to remove on a fresh menu
+    catch {
+        ; nothing to remove on a fresh menu (empty block: a bare catch would
+        ; swallow the next statement as its body - comment is not a statement)
+    }
     A_TrayMenu.Add("Open log folder", (*) => Run(Env.LogDir))
     A_TrayMenu.Add("Suspend hotkeys", (*) => ToggleSuspend())
     A_TrayMenu.Add()

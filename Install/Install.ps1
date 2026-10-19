@@ -42,6 +42,22 @@ function Write-Step([string]$Text) {
 
 Write-Step "Toolkit root: $Root"
 
+# Task registration (logon task + elevated weekly audit) requires
+# administrator rights: importing a task XML with a principal fails with
+# "Access is denied" otherwise. Re-launch elevated with the same switches.
+# Selftests still run inside the elevated copy, so nothing unverified
+# gets registered. -SkipTasks needs no elevation.
+if (-not $SkipTasks) {
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if (-not $isAdmin) {
+        Write-Host '[INSTALL] Task registration needs administrator rights (Task Scheduler import). Requesting elevation...' -ForegroundColor Yellow
+        $elevArgs = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"")
+        if ($ProtectData) { $elevArgs += '-ProtectData' }
+        $p = Start-Process -FilePath 'powershell.exe' -Verb RunAs -ArgumentList $elevArgs -Wait -PassThru
+        exit $p.ExitCode
+    }
+}
+
 # --- 1. Locate AutoHotkey v2 ---------------------------------------------------
 $AhkExe = @(
     (Join-Path $env:ProgramFiles 'AutoHotkey\v2\AutoHotkey64.exe'),
@@ -72,12 +88,14 @@ Get-ChildItem -Path $Root -Recurse -File |
 Write-Step 'Files unblocked (zone identifiers cleared where present)'
 
 # --- 4. Selftests (always run - never install over a broken foundation) ------------
-Write-Step 'Running selftests (takes ~30 s)...'
-& $AhkExe (Join-Path $Root 'Tests\Test-Core.ahk')
-if ($LASTEXITCODE -ne 0) { throw "Test-Core failed with exit $LASTEXITCODE - fix before installing." }
+Write-Step 'Running selftests (takes ~1-2 min)...'
+# AHK is a GUI-subsystem exe: the call operator would NOT wait for it.
+# Start-Process -Wait is required to read the real exit code.
+$p = Start-Process -FilePath $AhkExe -ArgumentList @((Join-Path $Root 'Tests\Test-Core.ahk')) -Wait -PassThru -WindowStyle Hidden
+if ($p.ExitCode -ne 0) { throw "Test-Core failed with exit $($p.ExitCode) - fix before installing." }
 Write-Step 'Test-Core: PASS'
-& $AhkExe (Join-Path $Root 'Scripts\Launcher.ahk') '--selftest'
-if ($LASTEXITCODE -ne 0) { throw "Launcher --selftest failed with exit $LASTEXITCODE - fix before installing." }
+$p = Start-Process -FilePath $AhkExe -ArgumentList @((Join-Path $Root 'Scripts\Launcher.ahk'), '--selftest') -Wait -PassThru -WindowStyle Hidden
+if ($p.ExitCode -ne 0) { throw "Launcher --selftest failed with exit $($p.ExitCode) - fix before installing." }
 Write-Step 'Launcher --selftest: PASS'
 
 # --- 5. Task Scheduler -------------------------------------------------------------
